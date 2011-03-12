@@ -1,12 +1,19 @@
-<?php if ( $success ) : ?>
-    <script type="text/javascript">
-	<!--
-	window.close();
-	//-->
-	</script>
-    <h3>Du bist nun eingeloggt.</h3>
+<?php use_helper('I18N') ?>
+<?php if ($success) : ?>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+
+    //window.close();
+
+    /* ]]> */
+  </script>
+  <h3><?php echo __('You are now logged in.') ?></h3>
 <?php else : ?>
-    <h3>Fehler beim Login!</h3>
+    <h3><?php echo __('Login Error!') ?></h3>
 <?php endif; ?>
 
-<p>Schließe dieses Fenster, um fortzufahren oder gehe zu deine <?php echo link_to('deiner letzten Seite', $sf_user->getAttribute('sfGoogleLogin_returnTo') );?>.</p>
+    <p><?php
+    echo __('Close this window to continue or go to your <a href=":url">last page</a>.', array(
+        ':url' => url_for($sf_user->getAttribute('sfGoogleLogin_returnTo'))
+    ))
+?></p>
