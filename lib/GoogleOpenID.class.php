@@ -72,7 +72,7 @@ class GoogleOpenID
             'openid.ns.ext1' => 'http://openid.net/srv/ax/1.0',
             'openid.ext1.mode' => 'fetch_request',
             'openid.ext1.type.email' => 'http://axschema.org/contact/email',
-            'openid.ext1.if_available' => 'email',
+            'openid.ext1.required' => 'email',
             'openid.ns.sreg' => 'http://openid.net/sreg/1.0',
             'openid.sreg.optional' => 'email',
         );
@@ -115,9 +115,7 @@ class GoogleOpenID
                 if ( $this->debug ) echo 'mac-key verified<br>';
                 
                 $this->user = $params['openid_claimed_id'];
-                /**
-                 * @todo user's email address
-                 */
+                $this->email = $params['openid_ext1_value_email'];
                 
                 return true;
             }
@@ -140,7 +138,6 @@ class GoogleOpenID
     
     /**
      * Returns the user email after a successful login sequence.
-     * @todo Read email from response.
      *
      * @return String The user email, null if none present.
      */

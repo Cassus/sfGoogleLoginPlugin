@@ -35,11 +35,14 @@ class sfGoogleLoginActions extends sfActions {
             if ( !$googleAccount = Doctrine::getTable('GoogleAccount')->findOneByUserToken( $googleUserToken ) ) {
                 $googleAccount = new GoogleAccount();
                 $googleAccount->setUserToken( $googleUserToken );
+                
+                //TODO try to connect existing user by email, or create new user
+
+                $googleAccount->save();
             }
-            $googleAccount->setLastLogin( date('Y-m-d H:i:s') );
-            $googleAccount->save();
             
-            $user->setAuthenticated( true );
+            
+            //$user->setAuthenticated( true );
             $user->setAttribute( 'sfGoogleLogin_account', $googleAccount );
         } else {
         	$this->success = false;

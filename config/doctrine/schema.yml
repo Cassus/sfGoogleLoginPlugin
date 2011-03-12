@@ -1,6 +1,7 @@
 GoogleAccount:
-    actAs:
-        Timestampable: ~
-    columns:
-        user_token: { type: string(255), notnull: true, unique: true }
-        last_login: { type: timestamp, notnull: true }
+  columns:
+    user_token: { type: string(255), notnull: true, unique: true }
+    sf_guard_user_id: { type: integer }
+  relations:
+    sfGuardUser:
+      foreignType: one
