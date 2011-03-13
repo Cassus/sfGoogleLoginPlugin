@@ -37,7 +37,7 @@ class sfGoogleLoginActions extends sfActions
       }
       if (!$sfGuardUser)
       {
-        $sfGuardUser = $this->getUser()->registerGoogleOpenIdUser($googleAccount, $googleOpenID->getEmail());
+        $sfGuardUser = $this->registerGoogleOpenIdUser($googleAccount, $googleOpenID->getEmail());
       }
 
       $this->getUser()->signIn($sfGuardUser);
@@ -45,6 +45,25 @@ class sfGoogleLoginActions extends sfActions
       $this->success = true;
     }
     $this->setLayout(false);
+  }
+
+  protected function registerGoogleOpenIdUser(GoogleAccount $googleAccount,
+                                              $emailAddress)
+  {
+    if (method_exists($this->getUser(), 'registerGoogleOpenIdUser'))
+    {
+      return $this->getUser()->registerGoogleOpenIdUser($googleAccount, $emailAddress);
+    }
+    else
+    {
+      $sfGuardUser = new sfGuardUser();
+      $sfGuardUser->username = $emailAddress;
+      $sfGuardUser->email_address = $emailAddress;
+      $sfGuardUser->GoogleAccount = $googleAccount;
+      $sfGuardUser->save();
+
+      return $sfGuardUser;
+    }
   }
 
 }
