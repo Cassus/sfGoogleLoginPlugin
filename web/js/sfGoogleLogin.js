@@ -64,3 +64,11 @@ function googleLogin() {
 		googleLogin.popupWatch = window.setInterval( this.googlePopupClose , 80);
 	}
 }
+
+$(function(){
+  $('a.googleLogin').click(function(e){
+    e.preventDefault();
+    var gLogin = new googleLogin();
+    gLogin.googleLoginPopup();
+  });
+});

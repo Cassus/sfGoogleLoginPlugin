@@ -7,54 +7,44 @@
  * @subpackage actions
  * @author     Sebastian Herbermann <sebastian.herbermann@googlemail.com>
  */
-class sfGoogleLoginActions extends sfActions {
+class sfGoogleLoginActions extends sfActions
+{
 
-	public function executeLogin(sfWebRequest $request) {
-        if ( $this->getUser()->isAuthenticated() ) {
-            $this->redirect('homepage');
-        }
-        
-        $user = $this->getUser();
-        
-        $googleOpenID = new GoogleOpenID( sfContext::getInstance()->getRequest()->getUriPrefix() );
-        
-        $user->setAttribute('sfGoogleLogin_returnTo', $request->getUri() );
-        $returnTo = $this->generateUrl('sfGoogleLogin_verify', array(), true);
-        
-        $this->loginUrl = $googleOpenID->getLoginUrl( $returnTo );
-        $this->loginJs = $googleOpenID->getLoginJs( $returnTo );
-	}
-	
-	public function executeVerify(sfWebRequest $request) {
-		$this->success = $request->getParameter('openid_mode') != 'cancel';
-        
-        $user = $this->getUser();
-        $googleOpenID = new GoogleOpenID( 'http://'.$_SERVER['SERVER_NAME'] );
-        
-        if ( $googleOpenID->verifyLogin() && $googleUserToken = $googleOpenID->getUser() ) {
-            if ( !$googleAccount = Doctrine::getTable('GoogleAccount')->findOneByUserToken( $googleUserToken ) ) {
-                $googleAccount = new GoogleAccount();
-                $googleAccount->setUserToken( $googleUserToken );
-                
-                //TODO try to connect existing user by email, or create new user
+  public function executeLogin(sfWebRequest $request)
+  {
 
-                $googleAccount->save();
-            }
-            
-            
-            //$user->setAuthenticated( true );
-            $user->setAttribute( 'sfGoogleLogin_account', $googleAccount );
-        } else {
-        	$this->success = false;
-        }
-        
-        $this->setLayout(false);
-	}
-	
-    public function executeLogout(sfWebRequest $request) {
-        $this->getUser()->setAuthenticated( false );
-        $this->getUser()->setAttribute( 'sfGoogleLogin_account', null );
-        $this->getUser()->setAttribute( 'sfGoogleLogin_returnTo', null );
-        $this->redirect( 'homepage' );
+  }
+
+  public function executeVerify(sfWebRequest $request)
+  {
+    $this->success = false;
+
+    $user = $this->getUser();
+    $googleOpenID = new GoogleOpenID('http://' . $_SERVER['SERVER_NAME']);
+
+    if ($googleOpenID->verifyLogin() && $token = $googleOpenID->getUser())
+    {
+      $googleAccount = GoogleAccountTable::getInstance()->findOrCreateOneByUserToken($token); /* @var $googleAccount GoogleAccount */
+
+
+      if (isset($googleAccount->sfGuardUser))
+      {
+        $sfGuardUser = $googleAccount->sfGuardUser;
+      }
+      else
+      {
+        $sfGuardUser = sfGuardUserTable::getInstance()->findOneByEmailAddress($googleOpenID->getEmail());
+      }
+      if (!$sfGuardUser)
+      {
+        $sfGuardUser = $this->getUser()->registerGoogleOpenIdUser($googleAccount, $googleOpenID->getEmail());
+      }
+
+      $this->getUser()->signIn($sfGuardUser);
+      $googleAccount->save();
+      $this->success = true;
     }
+    $this->setLayout(false);
+  }
+
 }

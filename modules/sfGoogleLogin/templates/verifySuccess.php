@@ -3,7 +3,7 @@
   <script type="text/javascript">
     /* <![CDATA[ */
 
-    //window.close();
+    window.close();
 
     /* ]]> */
   </script>
@@ -13,7 +13,5 @@
 <?php endif; ?>
 
     <p><?php
-    echo __('Close this window to continue or go to your <a href=":url">last page</a>.', array(
-        ':url' => url_for($sf_user->getAttribute('sfGoogleLogin_returnTo'))
-    ))
+    echo __('Close this window to return to your application.')
 ?></p>

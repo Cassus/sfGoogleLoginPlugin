@@ -12,11 +12,4 @@
 
 class PluginGoogleAccount extends BaseGoogleAccount
 {
-	public function preValidate($event) {
-		$object = $event->getInvoker ();
-		
-		if (! $object->getToken ()) {
-			$object->setToken ( sha1 ( $object->getEmail () . rand ( 11111, 99999 ) ) );
-		}
-	}
 }
